@@ -20,7 +20,26 @@ async function run() {
 	try {
 		await client.connect()
 		console.log('Database Connected')
-		const collection = client.db('todo-app').collection('todos')
+		const todoCollection = client.db('todo-app').collection('todos')
+		const userCollection = client.db('todo-app').collection('users')
+
+		app.put('/user/:email', async (req, res) => {
+			console.log(req.body)
+			const email = req.params.email
+			console.log(email)
+			const user = req.body
+			const filter = { email: email }
+			const options = { upsert: true }
+			const updateDoc = {
+				$set: user,
+			}
+			const result = await userCollection.updateOne(
+				filter,
+				updateDoc,
+				options
+			)
+			res.send({ result })
+		})
 	} finally {
 	}
 }
@@ -34,10 +53,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
 	console.log('Server is running on port', port)
 })
-
-// client.connect(err => {
-// 	console.log('DB connected successfully')
-// 	const collection = client.db('test').collection('devices')
-// 	// perform actions on the collection object
-// 	client.close()
-// })
