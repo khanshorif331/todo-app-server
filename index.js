@@ -23,10 +23,21 @@ async function run() {
 		const todoCollection = client.db('todo-app').collection('todos')
 		const userCollection = client.db('todo-app').collection('users')
 
-		app.put('/user/:email', async (req, res) => {
-			console.log(req.body)
+		app.get('/todos/:email', async (req, res) => {
 			const email = req.params.email
-			console.log(email)
+			const query = { user: email }
+			const result = await todoCollection.find(query).toArray()
+			res.send(result)
+		})
+
+		app.post('/todo', async (req, res) => {
+			const data = req.body
+			const result = await todoCollection.insertOne(data)
+			res.send(result)
+		})
+
+		app.put('/user/:email', async (req, res) => {
+			const email = req.params.email
 			const user = req.body
 			const filter = { email: email }
 			const options = { upsert: true }
