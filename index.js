@@ -3,7 +3,7 @@ const app = express()
 const port = process.env.PORT || 5000
 const cors = require('cors')
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
 // middlewares
 app.use(express.json())
@@ -23,16 +23,29 @@ async function run() {
 		const todoCollection = client.db('todo-app').collection('todos')
 		const userCollection = client.db('todo-app').collection('users')
 
+		// finding todo items according email
 		app.get('/todos/:email', async (req, res) => {
 			const email = req.params.email
 			const query = { user: email }
-			const result = await todoCollection.find(query).toArray()
+			const result = await (
+				await todoCollection.find(query).toArray()
+			).reverse()
 			res.send(result)
 		})
 
+		// adding new todo item
 		app.post('/todo', async (req, res) => {
 			const data = req.body
 			const result = await todoCollection.insertOne(data)
+			res.send(result)
+		})
+
+		// deleting todoItem by id
+		app.delete('/todo/:id', async (req, res) => {
+			const id = req.params.id
+			console.log(req.params)
+			const query = { _id: ObjectId(id) }
+			const result = await todoCollection.deleteOne(query)
 			res.send(result)
 		})
 
