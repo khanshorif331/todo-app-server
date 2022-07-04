@@ -61,6 +61,18 @@ async function run() {
 			res.send(result)
 		})
 
+		// updating todoo
+		app.put('/todo/update/:id', async (req, res) => {
+			const id = req.params.id
+			const updateInfo = req.body
+			const filter = { _id: ObjectId(id) }
+			const updateDoc = {
+				$set: updateInfo,
+			}
+			const result = await todoCollection.updateOne(filter, updateDoc)
+			res.send(result)
+		})
+
 		// completed todolist posting to the db
 		app.post('/completed/:id', async (req, res) => {
 			const id = req.params.id
